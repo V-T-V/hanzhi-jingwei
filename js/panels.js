@@ -293,3 +293,81 @@ function openXref(){
   pbody.querySelectorAll("a.xgo").forEach(a=>a.onclick=e=>e.stopPropagation());
   showPanel();
 }
+
+/* ═══════════ 郡国导出（与 tools/export_data.py 同口径：CSV BOM / KML / GeoJSON） ═══════════ */
+function exportRows(){
+  /* 郡国表：部域/郡国/卷/戸/口/縣数/入表县数/首县/治所今地/纬/经/src/置信/坐标注记 */
+  const jun = [];
+  HZ.bu.forEach(b=>b.states.forEach(u=>{
+    const note = "整编今地坐标（非考古定位）" + (u.seat_note ? "；" + u.seat_note : "");
+    jun.push([b.name, u.n, u.juan || "", u.hu || "", u.kou || "", u.nx || "",
+              (u.xian || []).length, u.seat || "", u.now || "",
+              (u.c ? u.c[0] : ""), (u.c ? u.c[1] : ""),
+              u.src || "derived", u.conf === 2 ? "推" : "确", note]);
+  }));
+  /* 县表：部域/郡国/县/首县|属县/附注 */
+  const xian = [];
+  HZ.bu.forEach(b=>b.states.forEach(u=>(u.xian || []).forEach((x, i)=>{
+    xian.push([b.name, u.n, x, i === 0 ? "首县" : "属县",
+      i === 0 ? "与郡治同治（" + (u.now || "").split("（")[0] + "）" : "名录存真，治所未定位"]);
+  })));
+  return {jun, xian};
+}
+function dlBlob(content, mime, fname){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([content], {type: mime}));
+  a.download = fname;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+}
+function csvOf(rows){
+  const NL = String.fromCharCode(10), BOM = String.fromCharCode(0xFEFF);
+  return BOM + rows.map(r=>r.join(",")).join(NL);
+}
+function openExport(){
+  vset("導出", "集");
+  const E = exportRows();
+  const M = window.HZXREF ? HZXREF.meta : null;
+  pbody.innerHTML = `
+    <div class="p-kicker">古今对照导出 · 与 tools/export_data.py 同口径（${E.jun.length} 郡国 / ${E.xian.length} 县）</div>
+    <div class="readrow" style="flex-direction:column;align-items:stretch;gap:8px">
+      <button class="readfull" id="ex-jcsv">⤓ 郡国对照 CSV（${E.jun.length} 行 · 带 BOM）</button>
+      <button class="readfull" id="ex-xcsv">⤓ 县名录 CSV（${E.xian.length} 行 · 带 BOM）</button>
+      <button class="readfull" id="ex-kml">⤓ 郡治点位 KML（Google Earth）</button>
+      <button class="readfull" id="ex-geo">⤓ 郡治点位 GeoJSON</button>
+    </div>
+    <div class="p-cap">字段口径</div>
+    <div class="hint">郡国表：部域、郡国、卷（上/下）、戸与口（元始二年）、縣数（原文载）与入表县数、首县、治所今地（即今名依据）、纬度、经度、src、置信（确/推）、坐标注记。县表：部域、郡国、县、首县/属县、附注。坐标为依汉代政区地理整编之今地（src:derived，非考古定位），首县例与郡同治（例外注明），余县但存名录不做定位臆测——导出中如实注明。汉唐对照另见「漢唐」页签${M ? "（匹配 " + M.matched + " 郡）" : ""}。</div>`;
+  pbody.querySelector("#ex-jcsv").onclick = ()=>{
+    const {jun} = exportRows();
+    jun.unshift(["部域","郡国","卷","戸（元始二年）","口","縣数（原文载）","入表县数","首县","治所今地（依据）","纬度","经度","src","置信","坐标注记"]);
+    dlBlob(csvOf(jun), "text/csv;charset=utf-8", "汉志经纬-郡国对照.csv");
+  };
+  pbody.querySelector("#ex-xcsv").onclick = ()=>{
+    const {xian} = exportRows();
+    xian.unshift(["部域","郡国","县","首县/属县","附注"]);
+    dlBlob(csvOf(xian), "text/csv;charset=utf-8", "汉志经纬-县名录.csv");
+  };
+  pbody.querySelector("#ex-kml").onclick = ()=>{
+    let pins = "";
+    HZ.bu.forEach(b=>b.states.forEach(u=>{
+      if (!u.c) return;
+      pins += `<Placemark><name>${u.n}</name><description>${b.name} · 卷${u.juan || ""} · 戸${u.hu || ""} 口${u.kou || ""} 縣${u.nx || ""} 今${u.now || ""}（src:derived 置信${u.conf === 2 ? "推" : "确"}）</description><Point><coordinates>${u.c[1]},${u.c[0]},0</coordinates></Point></Placemark>`;
+    }));
+    const kml = `<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>汉志经纬·郡治点位（整编今地坐标）</name>${pins}</Document></kml>`;
+    dlBlob(kml, "application/vnd.google-earth.kml+xml", "汉志经纬-郡治点位.kml");
+  };
+  pbody.querySelector("#ex-geo").onclick = ()=>{
+    const feats = [];
+    HZ.bu.forEach(b=>b.states.forEach(u=>{
+      if (!u.c) return;
+      feats.push({type: "Feature", geometry: {type: "Point", coordinates: [u.c[1], u.c[0]]},
+        properties: {名: u.n, 部域: b.name, 卷: u.juan || "", 戸: u.hu || 0, 口: u.kou || 0,
+          縣: u.nx || 0, 首县: u.seat || "", 今地: u.now || "",
+          src: u.src || "derived", 置信: u.conf === 2 ? "推" : "确",
+          坐标注记: "整编今地坐标（非考古定位）"}});
+    }));
+    dlBlob(JSON.stringify({type: "FeatureCollection", features: feats}), "application/geo+json", "汉志经纬-郡治点位.geojson");
+  };
+  showPanel();
+}

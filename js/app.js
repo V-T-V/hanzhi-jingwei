@@ -120,6 +120,8 @@ if (_nl) _nl.onclick = ()=>{
 };
 var _xl = document.getElementById("xreflink");
 if (_xl) _xl.onclick = openXref;
+var _el = document.getElementById("exportlink");
+if (_el) _el.onclick = openExport;
 
 /* PWA 离线徽标 */
 (function(){
