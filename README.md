@@ -1,5 +1,7 @@
 # 汉志经纬 · 漢書地理志
 
+[![CI](https://github.com/V-T-V/hanzhi-jingwei/actions/workflows/ci.yml/badge.svg)](https://github.com/V-T-V/hanzhi-jingwei/actions/workflows/ci.yml)
+
 《漢書·地理志》（東漢·班固 撰，唐·顔師古 注，志第八，上下两卷）数字人文站——
 十四部域一百三郡国舆图、元始二年户口、郡县循读、全书志文检索、域分风俗十三区。
 文本自 kanripo《前漢書》（KR2a0007，文淵閣四庫本）卷二十八抓取解析，上下两卷俱全。
@@ -58,7 +60,9 @@ python -m http.server 9800
   卷二十五/二十六之宣州）——按汉部域分组 + 汉志原文句 × 元和原文句样例 +
   ↗元和 深链（`../YHJZ/#dao=…&zhou=…`，姊妹站元和经纬数据**只读**）
 - **书签/漫游**：郡卡 ☆ 收藏（localStorage）；⚑ 漫游随机入郡
-- **PWA**：Service Worker 三级缓存，首访后全志离线可读
+- **郡国导出**（底栏「⤓ 導出」）：郡国对照 / 县名录 CSV（带 BOM）+ 郡治点位 KML / GeoJSON，
+  与 `tools/export_data.py` 同口径（103 郡国 + 1,578 县），整编坐标逐行注明
+- **PWA**：Service Worker 三级缓存，首访后全志离线可读（离线四验见 `tools/offline_check.py`）
 
 ## 结构
 
@@ -114,13 +118,18 @@ python -m http.server 9800
 [docs/ANALYSIS.md](docs/ANALYSIS.md)——覆盖表、元始二年户口（前十郡）、属县规模、
 名物注记、部域分组、条目文量、汉唐对照——数字全出自脚本
 （`tools/stats.py`；本页由 `tools/build_analysis.py` 自 stats.json 生成）。
+论文定本：[docs/汉志经纬-数字人文.pdf](docs/汉志经纬-数字人文.pdf)（5 页 3 图，
+由 `tools/build_paper_pdf.py` 自 ANALYSIS.md 排印，插图出自 `tools/build_paper_figs.py`；
+**改 ANALYSIS.md 必须重排 PDF**，lint 哨兵会拦）。
 
 ## 校验
 
 ```
-python tools/lint.py       # 禁止清单 + 互查桥自洽 + 语料溯源（15 类）
-python run_tests.py        # lint + 16 数据断言 + 3 无头断言页（需本地服务 9800）
+python tools/lint.py       # 禁止清单 + 互查桥自洽 + 语料溯源 + 论文 PDF 哨兵（16 类）
+python run_tests.py        # lint + 21 数据断言（含导出/账目）+ 3 无头断言页 + 离线四验（需本地服务 9800）
 # 管线重入顺序：fetch → build_data → build_text → build_xref_yh → stats → build_analysis
+#              → build_paper_pdf → export_data → build_sums（产物定稿后记账）
+python tools/offline_check.py   # 离线四验专步（audit.yml 周六 10:40 CST 亦硬跑）
 ```
 
 ## 数据源与致谢
@@ -141,3 +150,7 @@ python run_tests.py        # lint + 16 数据断言 + 3 无头断言页（需本
 - 汉唐桥为治所近距（≤35 km）+ 同名/承名的自动匹配：同名异地不入档，
   元和缺卷所致无对应逐条注明卷次；承名整编 5 条（汝南→蔡州等）书证在脚本注记
 - 抓取源为 GitHub raw 在线服务，重抓请 `python tools/fetch_text.py`（断点续抓）
+
+学术引用：[CITATION.cff](CITATION.cff)（CFF 1.2.0 · dataset）——构建产物指纹账本另见
+[SHA256SUMS](SHA256SUMS)，`python tools/build_sums.py` 重算、`run_tests.py` 对账
+（行尾无关口径，Windows/Linux checkout 皆成立）。

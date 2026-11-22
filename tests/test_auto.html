@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="vendor/leaflet.css">
 <script>window.__NOTILES__=1;/* 测试密封：不拉外网瓦片 */</script>
 <script src="vendor/leaflet.js"></script>
-<link rel="stylesheet" href="css/main.css?v=1">
+<link rel="stylesheet" href="css/main.css?v=2">
 </head>
 <body class="nopanel">
 <div id="map"></div>
@@ -29,16 +29,16 @@
 
 <script src="data/site_data.js" defer></script>
 <script src="data/xref_yh.js" defer></script>
-<script src="js/config.js?v=1" defer></script>
-<script src="js/map.js?v=1" defer></script>
-<script src="js/panels.js?v=1" defer></script>
-<script src="js/rail.js?v=1" defer></script>
-<script src="js/search.js?v=1" defer></script>
-<script src="js/reader.js?v=1" defer></script>
-<script src="js/ft_core.js?v=1" defer></script>
-<script src="js/fulltext.js?v=1" defer></script>
-<script src="js/app.js?v=1" defer></script>
-<script src="js/modes.js?v=1" defer></script>
+<script src="js/config.js?v=2" defer></script>
+<script src="js/map.js?v=2" defer></script>
+<script src="js/panels.js?v=2" defer></script>
+<script src="js/rail.js?v=2" defer></script>
+<script src="js/search.js?v=2" defer></script>
+<script src="js/reader.js?v=2" defer></script>
+<script src="js/ft_core.js?v=2" defer></script>
+<script src="js/fulltext.js?v=2" defer></script>
+<script src="js/app.js?v=2" defer></script>
+<script src="js/modes.js?v=2" defer></script>
 <script defer>
 window.addEventListener("load", () => {
   const log = [];
@@ -138,7 +138,15 @@ window.addEventListener("load", () => {
               P("XREF deeplink-../YHJZ/", !!xgo && xgo.getAttribute("href").indexOf("../YHJZ/#dao=") === 0);
               P("XREF samples-han-text", pb.textContent.includes("漢書地理志") || pb.textContent.includes("元和郡县"));
               P("XREF why-missing-juan", pb.textContent.includes("佚") || pb.textContent.includes("桥无所出"));
-              // ⑫ 深链复原
+              // ⑫ 导出（同口径计数，与 tools/export_data.py 互证）
+              const ex = exportRows();
+              P("EXPORT jun-rows=103 (" + ex.jun.length + ")", ex.jun.length === 103);
+              P("EXPORT xian-rows=1578 (" + ex.xian.length + ")", ex.xian.length === 1578);
+              openExport();
+              pb = document.getElementById("pbody");
+              P("EXPORT panel-buttons", pb.querySelectorAll("#pbody .readfull").length === 4);
+              P("EXPORT kicker-tongyi", pb.textContent.includes("同口径"));
+              // ⑬ 深链复原
               openBu(HZ.bu.find(b => b.id === "yu"));
               P("DEEP bu-panel", document.getElementById("vname").textContent.includes("豫"));
               done();
