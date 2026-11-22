@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三维形胜 · 汉志经纬</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%2337414e'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23f6efdc' font-family='KaiTi,serif'%3E漢%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="css/main.css?v=1">
+<style>
+html,body{height:100%;overflow:hidden}
+#map3d{position:fixed;inset:0}
+#pillarcard{
+  position:fixed;left:18px;bottom:64px;z-index:30;width:300px;max-width:80vw;
+  background:rgba(245,238,218,.94);border:1px solid var(--line);
+  box-shadow:0 12px 30px -12px rgba(60,45,20,.5);padding:14px 16px;display:none;
+}
+#pillarcard h3{font-family:KaiTi,serif;font-size:21px;letter-spacing:4px;color:var(--ink);margin-bottom:4px}
+#pillarcard .m{font-size:11.5px;letter-spacing:1px;color:var(--ink-mid);margin:2px 0}
+#pillarcard .go2d{display:inline-block;margin-top:8px;color:var(--cinnabar-d);font-size:12px;letter-spacing:1px;text-decoration:none;border-bottom:1px dashed var(--cinnabar-d)}
+#views3d{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:30;display:flex;gap:8px}
+#views3d button{
+  appearance:none;font-family:inherit;font-size:12px;letter-spacing:2px;cursor:pointer;
+  background:rgba(245,238,218,.92);border:1px solid var(--line);color:var(--ink-mid);padding:6px 14px;
+}
+#views3d button:hover{color:var(--cinnabar-d);border-color:var(--cinnabar)}
+footer.three{position:fixed;left:0;right:0;bottom:0;z-index:28;height:44px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 16px;background:rgba(245,238,218,.94);
+  border-top:1px solid var(--line);font-size:11px;letter-spacing:1.5px;color:var(--ink-mid)}
+#boot3d{
+  position:fixed;inset:0;z-index:60;background:rgba(235,224,196,.96);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+  transition:opacity .8s;pointer-events:none;
+}
+#boot3d.gone{opacity:0}
+#boot3d .t{font-family:KaiTi,serif;font-size:30px;letter-spacing:12px;color:var(--ink)}
+#boot3d .s{font-size:12px;letter-spacing:3px;color:var(--ink-faint)}
+</style>
+</head>
+<body>
+<div id="map3d"></div>
+<div id="views3d"></div>
+<div id="pillarcard"></div>
+<footer class="three">
+  <span>三维形胜 · 郡点立于真地形（1.35× 夸张） · 圆径随属县数 · 色随部域</span>
+  <span><button class="ftool" id="back2d" style="font-size:12px">⟨ 回二维舆图</button></span>
+</footer>
+<div id="boot3d">
+  <div class="t">漢 家 山 川</div>
+  <div class="s">凡郡國一百三 · 元始二年之籍 · 真地形上观之</div>
+</div>
+<script src="data/site_data.js" defer></script>
+<script src="vendor/maplibre-gl.js" defer></script>
+<script src="js/map3d.js?v=1" defer></script>
+</body>
+</html>

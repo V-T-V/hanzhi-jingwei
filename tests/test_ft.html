@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<base href="../">
+<meta charset="UTF-8">
+<title>全文检索验证 · 汉志经纬</title>
+</head>
+<body>
+<pre id="testlog" style="background:#fff;border:2px solid #a8391f;padding:8px;font:12px/1.6 monospace;white-space:pre-wrap"></pre>
+<script src="js/ft_core.js?v=1"></script>
+<script>
+/* Worker 纯核验证（无 DOM）：countHits / ftSnippet 确定性 */
+const log = [];
+const P = (n, ok) => log.push(n + " " + (ok ? "PASS" : "FAIL"));
+const done = () => {
+  document.getElementById("testlog").textContent = "TESTLOG\n" + log.join("\n") + "\nENDLOG";
+  document.title = log.some(l => l.includes("FAIL")) ? "HAS-FAIL" : "ALL-PASS";
+};
+
+/* ① countHits 基本计数 */
+P("count-鐵官=5", countHits("有鐵官甲有鐵官乙有鐵官丙鐵官丁鐵官", "鐵官") === 5);
+P("count-none=0", countHits("漢極盛矣", "鐵官") === 0);
+P("count-overlap", countHits("莽莽曰曰", "莽曰") === 1);
+/* ② ftSnippet 片段（前缀 20 字 > 窗口 18 → 有首省略号） */
+const s1 = ftSnippet("一二三四五六七八九十一二三四五六七八九十莽曰顺通后文一十八字", "莽曰");
+P("snip-has-b", s1 && s1.includes("<b>莽曰</b>"));
+P("snip-head-ellipsis", s1 && s1.startsWith("…"));
+P("snip-esc", ftSnippet("a<b>&c莽曰d", "莽曰") !== null);
+/* ③ Worker 实测 */
+try {
+  const w = new Worker("js/ftworker.js");
+  w.onmessage = e => {
+    const r = e.data.results;
+    P("worker-responds-q", e.data.q === "師古曰");
+    P("worker-hits>=50 (" + r.length + ")", r.length >= 50);
+    P("worker-sorted", !r.length || r[0].n >= r[r.length - 1].n);
+    P("worker-snip", !r.length || r[0].snip.includes("<b>師古曰</b>"));
+    done();
+    w.terminate();
+  };
+  w.onerror = () => { P("worker-error", false); done(); };
+  const docs = [];
+  for (let i = 0; i < 60; i++)
+    docs.push({key: "t", title: "篇" + i, kicker: "k",
+               text: "師古曰".repeat(i % 7 + 1) + "漢極盛矣"});
+  w.postMessage({q: "師古曰", docs: docs});
+} catch (e) {
+  P("worker-unavailable " + e, false);
+  done();
+}
+</script>
+</body>
+</html>

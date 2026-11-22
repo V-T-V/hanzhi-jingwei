@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="theme-color" content="#efe6cf">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>汉志经纬 · 漢書地理志</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%2337414e'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23f6efdc' font-family='KaiTi,serif'%3E漢%3C/text%3E%3C/svg%3E">
+<meta name="description" content="东汉·班固《漢書·地理志》数字舆图——十四部域一百三郡国、元始二年户口、郡县循读、全书志文检索、域分风俗十三区。文渊阁四库本。">
+<meta property="og:title" content="汉志经纬 · 漢書地理志">
+<meta property="og:description" content="凡郡国一百三，县邑千三百一十四——西汉末政区地理全书交互舆图。">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "汉志经纬",
+  "alternateName": "漢書地理志数字舆图",
+  "description": "东汉·班固《漢書·地理志》交互舆图——一百三郡国郡县治所",
+  "about": {
+    "@type": "Book",
+    "name": "漢書·地理志",
+    "author": {"@type": "Person", "name": "班固", "birthDate": "32", "deathDate": "92"},
+    "numberOfPages": 2
+  },
+  "inLanguage": "zh-CN",
+  "datePublished": "2026-11-23"
+}
+</script>
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
+<script src="vendor/leaflet.js" defer></script>
+<link rel="stylesheet" href="css/main.css?v=1">
+</head>
+<body class="nopanel">
+
+<div id="map"></div>
+<div class="paper-wash"></div>
+<div class="grain"></div>
+
+<div class="north" id="north">
+  <svg viewBox="0 0 40 40">
+    <circle cx="20" cy="20" r="17" fill="rgba(245,238,218,.75)" stroke="rgba(88,72,44,.45)" stroke-width="1"/>
+    <path d="M20 5 L24 22 L20 19 L16 22 Z" fill="#a8391f"/>
+    <path d="M20 35 L23 22 L20 24.5 L17 22 Z" fill="#897d66"/>
+    <text x="20" y="14" text-anchor="middle" class="nn">北</text>
+  </svg>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="seal">漢志</div>
+    <div><h1>汉志经纬</h1><p>漢書·地理志 · 東漢·班固 · 元始二年户口之籍</p></div>
+  </div>
+  <div id="searchwrap">
+    <input id="search" type="text" placeholder="检郡·县·部域名，如 弘農 / 長安 / 玄菟" autocomplete="off">
+    <span class="sicon">⌕</span>
+    <div id="sresults"></div>
+  </div>
+</header>
+
+<aside id="rail">
+  <div class="rt" id="railtitle">十四部域一百三郡国<small>循郡而读</small></div>
+  <div id="raillist"></div>
+</aside>
+
+<section id="panel">
+  <button id="pclose" title="收起">✕</button>
+  <div class="vtitle"><div class="vname" id="vname"></div><div class="vseal" id="vseal">漢志</div></div>
+  <div id="pbody"></div>
+</section>
+
+<footer>
+  <span class="ftools-label">探索</span>
+  <button class="ftool" id="wanderlink" title="随机入一郡读其户口县目">⚑ 漫游</button>
+  <button class="ftool" id="bmlink" title="我的书签">☆ 书签</button>
+  <button class="ftool" id="nightlink" title="夜读墨色">☾ 夜读</button>
+  <button class="ftool" id="yflink" title="域分风俗十三区域">☲ 域分</button>
+  <button class="ftool" id="tdlink" title="三维形胜——真地形上观百三郡国">⛰ 形胜</button>
+  <button class="ftool" id="xreflink" title="汉郡治 ↔ 唐州治对照 · 深链元和经纬">漢唐</button>
+  <span class="sep"></span>
+  <span id="bookstat"></span>
+  <div class="right">
+    <span id="swstate" title="Service Worker 就绪后：全志与已览瓦片离线可用" style="display:none;color:var(--xuan-d);cursor:default"></span>
+    <span class="link" id="aboutlink">关于 · 版本记</span>
+    <span>文本 · kanripo 前漢書（四库本）</span>
+    <span>底图 · Esri World Physical</span>
+  </div>
+</footer>
+
+<div id="boot">
+  <div class="bseal">漢志</div>
+  <h2>汉志经纬</h2>
+  <p>漢書·地理志 · 上下两卷 · 班固 撰 · 顔師古 注</p>
+  <p style="letter-spacing:2px;font-size:11px">凡郡国一百三 · 县邑千三百一十四 · 漢極盛矣</p>
+  <div class="go">展 卷</div>
+</div>
+
+<!-- 加载链：解析数据 → 配置 → 地图 → 面板/纲目/检索 → 阅读器 → 全文核 → 启动 → 深链 -->
+<script src="data/site_data.js" defer></script>
+<script src="data/xref_yh.js" defer></script>
+<script src="js/config.js?v=1" defer></script>
+<script src="js/map.js?v=1" defer></script>
+<script src="js/panels.js?v=1" defer></script>
+<script src="js/rail.js?v=1" defer></script>
+<script src="js/search.js?v=1" defer></script>
+<script src="js/reader.js?v=1" defer></script>
+<script src="js/ft_core.js?v=1" defer></script>
+<script src="js/fulltext.js?v=1" defer></script>
+<script src="js/app.js?v=1" defer></script>
+<script src="js/modes.js?v=1" defer></script>
+<script>
+/* PWA：HTTP(S) 下注册 Service Worker（file:// 静默跳过，失败不影响站点） */
+if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+  addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{
+ "states": 103,
+ "states_listed_ok": 103,
+ "counties_parsed": 1578,
+ "counties_stated_sum": 1578,
+ "xianyi_expected": 1587,
+ "hu_sum": 12296468,
+ "kou_sum": 57671401,
+ "hu_empire": 12233062,
+ "kou_empire": 59594978,
+ "seats": 103,
+ "coords": 103,
+ "conf1": 58,
+ "conf2": 45,
+ "badges": {
+  "tie": 33,
+  "yan": 23,
+  "gong": 9,
+  "ju": 1,
+  "mu": 1,
+  "shui": 0,
+  "ci": 48,
+  "mang": 671
+ },
+ "regions": 13,
+ "per_bu": {
+  "司隶部": {
+   "states": 7,
+   "xian": 132
+  },
+  "豫州部": {
+   "states": 5,
+   "xian": 109
+  },
+  "兖州部": {
+   "states": 7,
+   "xian": 110
+  },
+  "青州部": {
+   "states": 10,
+   "xian": 123
+  },
+  "徐州部": {
+   "states": 6,
+   "xian": 132
+  },
+  "冀州部": {
+   "states": 12,
+   "xian": 184
+  },
+  "幽州部": {
+   "states": 9,
+   "xian": 125
+  },
+  "并州部": {
+   "states": 5,
+   "xian": 72
+  },
+  "朔方部": {
+   "states": 4,
+   "xian": 85
+  },
+  "凉州部": {
+   "states": 9,
+   "xian": 115
+  },
+  "益州部": {
+   "states": 9,
+   "xian": 128
+  },
+  "荆州部": {
+   "states": 7,
+   "xian": 115
+  },
+  "扬州部": {
+   "states": 6,
+   "xian": 93
+  },
+  "交趾部": {
+   "states": 7,
+   "xian": 55
+  }
+ }
+}

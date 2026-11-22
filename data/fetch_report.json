@@ -1,0 +1,19 @@
+{
+ "source": "kanripo/KR2a0007（前漢書·文淵閣四庫本）via raw.githubusercontent.com",
+ "files": [
+  {
+   "key": "000",
+   "label": "四庫提要",
+   "res": "skip",
+   "chars_no_space": 12890
+  },
+  {
+   "key": "028",
+   "label": "漢書地理志上下",
+   "res": "fetched 74509 chars",
+   "chars_no_space": 70157
+  }
+ ],
+ "fetched_at": "2026-11-23 00:08:08",
+ "total_chars": 83047
+}

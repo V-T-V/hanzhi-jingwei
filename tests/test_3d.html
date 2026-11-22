@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<base href="../">
+<meta charset="UTF-8">
+<title>3D 文柱验证 · 汉志经纬</title>
+<link rel="stylesheet" href="css/main.css?v=1">
+<style>
+html,body{height:auto;overflow:auto}
+#views3d{position:static;transform:none;display:flex;gap:8px;margin:8px}
+#pillarcard{position:static;display:none;width:300px;margin:8px}
+</style>
+</head>
+<body>
+<h3 style="font:16px KaiTi,serif">3D 沙箱验证（无 WebGL 亦可验数据与交互）</h3>
+<div id="views3d"></div>
+<div id="pillarcard"></div>
+<pre id="testlog" style="background:#fff;border:2px solid #a8391f;padding:8px;font:12px/1.6 monospace;white-space:pre-wrap"></pre>
+<script src="data/site_data.js" defer></script>
+<script src="vendor/maplibre-gl.js" defer></script>
+<script src="js/map3d.js?v=1" defer></script>
+<script defer>
+window.addEventListener("load", () => {
+  const log = [];
+  const P = (n, ok) => log.push(n + " " + (ok ? "PASS" : "FAIL"));
+  const done = () => {
+    document.getElementById("testlog").textContent = "TESTLOG\n" + log.join("\n") + "\nENDLOG";
+    document.title = log.some(l => l.includes("FAIL")) ? "HAS-FAIL" : "ALL-PASS";
+  };
+  setTimeout(() => {
+    try {
+      P("HZ3D hook", typeof HZ3D === "object");
+      P("YT_MIN=500", HZ3D.YT_MIN === 500);
+      const g = HZ3D.pillarGeo();
+      P("pillar-geo>=10 (" + g.features.length + ")", g.features.length >= 10);
+      const hs = g.features.map(f => f.properties.h);
+      P("pillar-h-in-range", hs.every(h => h >= 400 && h <= 5000));
+      const names = new Set(g.features.map(f => f.properties.n));
+      P("pillar-unique-names", names.size === g.features.length);
+      P("pillar-has-琅邪郡", names.has("琅邪郡"));
+      const p0 = g.features[0].properties;
+      P("pillar-card", HZ3D.openPillar(p0) &&
+         document.getElementById("pillarcard").textContent.includes("文柱"));
+      P("pillar-card-link-2d", document.querySelector("#pillarcard .go2d")
+        .getAttribute("href").indexOf("index.html#bu=") === 0);
+      HZ3D.setPillarOn(false);
+      P("pillar-toggle-off", HZ3D.isPillarOn() === false);
+      HZ3D.setPillarOn(true);
+      P("pillar-toggle-on", HZ3D.isPillarOn() === true);
+      done();
+    } catch (e) { P("3D-ERR " + e, false); done(); }
+  }, 1200);
+});
+</script>
+</body>
+</html>
