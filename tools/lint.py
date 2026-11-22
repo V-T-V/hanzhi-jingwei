@@ -217,6 +217,21 @@ check(fetch["files"][0]["res"] in ("skip", "fetched") and fetch["total_chars"] >
       f"抓取盘点在位（{fetch['total_chars']} 字）")
 check("kanripo" in sd["meta"]["source"], "meta 记 kanripo 源")
 
+# ── 16. 论文 PDF 同步哨兵（ANALYSIS.md 改动必须重排 PDF） ──
+print("── 16. 论文 PDF 哨兵")
+pdf_path = "docs/汉志经纬-数字人文.pdf"
+md_path = "docs/ANALYSIS.md"
+check(os.path.exists(pdf_path), "docs/汉志经纬-数字人文.pdf 存在（python tools/build_paper_pdf.py）")
+if os.path.exists(pdf_path) and os.path.exists(md_path):
+    mt, pt = os.path.getmtime(md_path), os.path.getmtime(pdf_path)
+    if mt > pt + 60:
+        import time
+        check(False, f"ANALYSIS.md（{time.strftime('%m-%d %H:%M', time.localtime(mt))}）"
+                     f"新于 PDF（{time.strftime('%m-%d %H:%M', time.localtime(pt))}）——请重跑 tools/build_paper_pdf.py")
+    else:
+        check(True, "ANALYSIS.md ↔ 论文 PDF 同步")
+    check(os.path.getsize(pdf_path) > 100000, "论文 PDF 非空壳（>100KB）")
+
 print()
 if fails:
     for f_ in fails:

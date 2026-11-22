@@ -15,10 +15,10 @@ def fm(n):
 
 def bars(pairs, unit=""):
     mx = max(v for _, v in pairs) or 1
-    out = []
+    out = ["| 名 | 数 | 分布 |", "|---|---|---|"]
     for k, v in pairs:
         w = int(round(v / mx * 26))
-        out.append(f"| {k} | `{unit}{fm(v)}` | {'█' * w}{w and ' ' or ''}|")
+        out.append(f"| {k} | `{unit}{fm(v)}` | {'█' * w}{' ' if w else ''}|")
     return "\n".join(out)
 
 
